@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Task Assigned</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#f3f4f6;padding:32px 0;">
+    <tr>
+      <td align="center">
+        <!-- Main container -->
+        <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.07);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#7c3aed;padding:28px 32px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td style="color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.5px;">
+                    &#10003; Assign
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:36px 32px 24px 32px;">
+              <h1 style="margin:0 0 8px 0;font-size:22px;font-weight:700;color:#111827;line-height:1.3;">
+                You've been assigned a new task
+              </h1>
+              <p style="margin:0 0 24px 0;font-size:15px;color:#6b7280;line-height:1.5;">
+                Hi {{assignee_name}},
+              </p>
+              <p style="margin:0 0 20px 0;font-size:15px;color:#374151;line-height:1.6;">
+                <strong>{{creator_name}}</strong> has assigned you a new task:
+              </p>
+
+              <!-- Task title box -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:24px;">
+                <tr>
+                  <td style="border-left:4px solid #7c3aed;background-color:#f9fafb;padding:16px 20px;border-radius:0 8px 8px 0;">
+                    <p style="margin:0;font-size:17px;font-weight:600;color:#1f2937;">
+                      {{task_title}}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Details section -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:24px;">
+                <tr>
+                  <td style="padding:0 0 8px 0;">
+                    <table role="presentation" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="font-size:13px;color:#6b7280;padding-right:12px;vertical-align:middle;">
+                          Priority:
+                        </td>
+                        <td>
+                          <span style="display:inline-block;padding:3px 10px;font-size:12px;font-weight:600;color:{{priority_color}};background-color:{{priority_bg_color}};border-radius:9999px;">
+                            {{task_priority}}
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0 0 0;font-size:13px;color:#6b7280;">
+                    Due date: <span style="color:#374151;font-weight:500;">{{task_due_date}}</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Description -->
+              {% if task_description %}
+              <p style="margin:0 0 28px 0;font-size:14px;color:#4b5563;line-height:1.6;background-color:#f9fafb;padding:14px 16px;border-radius:8px;">
+                {{task_description}}
+              </p>
+              {% endif %}
+
+              <!-- CTA button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" style="padding:4px 0 0 0;">
+                    <a href="{{task_url}}" target="_blank" style="display:inline-block;padding:13px 32px;background-color:#7c3aed;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;border-radius:8px;letter-spacing:0.3px;">
+                      View Task
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding:0 32px;">
+              <hr style="border:none;border-top:1px solid #e5e7eb;margin:0;">
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 32px 28px 32px;">
+              <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;line-height:1.5;">
+                Sent by <strong style="color:#7c3aed;">Assign</strong> &mdash; Delegate. Track. Done.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
