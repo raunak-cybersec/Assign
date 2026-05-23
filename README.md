@@ -1,276 +1,331 @@
-<![CDATA[<div align="center">
+# Assign — Task Management Application
 
-# ✓ Assign
+> "Delegate. Track. Done." — A production-grade task management platform built for teams.
 
-### Delegate. Track. Done.
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?style=flat&logo=vercel&logoColor=white)](https://vercel.com/)
 
-Assign helps teams delegate tasks, track progress, and get things done — without the chaos.
+---
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![Flask](https://img.shields.io/badge/Flask-3.1-green?style=flat-square&logo=flask)](https://flask.palletsprojects.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase)](https://supabase.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
+## 🔗 Live Demo
 
-[Live Demo](https://assign-app.vercel.app) · [Report Bug](https://github.com/yourusername/assign/issues) · [Request Feature](https://github.com/yourusername/assign/issues)
+| Service | URL |
+|--------|-----|
+| **Frontend** | [assign-raunak.vercel.app](https://assign-raunak.vercel.app) |
+| **Backend API** | [assign-backend.onrender.com](https://assign-backend.onrender.com) |
 
-</div>
+> **Note:** Backend is hosted on Render free tier — may take 30–60 seconds to wake up on first request.
+
+---
+
+## 📌 Features
+
+- **Google OAuth 2.0** — Sign in with Gmail, profile photo and name pulled automatically
+- **Create & Assign Tasks** — Title, description, due date, priority (Low / Medium / High), assign to any registered user
+- **Email Notifications** — HTML-branded email sent via Gmail SMTP when a task is assigned, and when a task is marked complete
+- **Kanban Board** — Drag and drop tasks between Todo → In Progress → Completed columns
+- **Task List View** — Table view with sorting and filtering by status, priority, assignee
+- **Task Detail Page** — Full details, due date countdown, activity log, assignee avatar
+- **In-App Notifications** — Bell icon with unread count, dropdown of recent activity
+- **Overdue Detection** — Tasks past due date automatically show a red "Overdue" badge
+- **Dashboard** — Summary cards (Total, Todo, In Progress, Completed) + Recent Activity feed
+- **Loading Skeletons** — Skeleton loaders instead of spinners for a polished experience
+- **Toast Notifications** — Feedback on every action (create, update, delete)
+- **Fully Responsive** — Mobile-first layout with hamburger menu
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                      CLIENT (Browser)                    │
-│                                                         │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │              Next.js 14 Frontend                   │  │
-│  │        TypeScript + Tailwind + Framer Motion       │  │
-│  │              Hosted on Vercel                      │  │
-│  └──────────┬────────────────────────┬───────────────┘  │
-│             │                        │                   │
-│         Auth Flow              REST API Calls            │
-│             │                        │                   │
-│  ┌──────────▼──────────┐  ┌─────────▼────────────────┐  │
-│  │   Supabase Auth     │  │   Flask REST API          │  │
-│  │   (Google OAuth)    │  │   Hosted on Render        │  │
-│  │                     │  │                           │  │
-│  │  ┌───────────────┐  │  │  ┌─────────────────────┐ │  │
-│  │  │ JWT Tokens    │──│──│──│ Auth Middleware      │ │  │
-│  │  └───────────────┘  │  │  └─────────────────────┘ │  │
-│  └──────────┬──────────┘  │                           │  │
-│             │             │  ┌─────────────────────┐  │  │
-│             │             │  │ Email Service        │  │  │
-│             │             │  │ (Gmail SMTP)         │  │  │
-│             │             │  └─────────────────────┘  │  │
-│             │             └──────────┬────────────────┘  │
-│             │                        │                   │
-│  ┌──────────▼────────────────────────▼───────────────┐  │
-│  │              Supabase (PostgreSQL)                 │  │
-│  │                                                    │  │
-│  │  ┌──────────┐ ┌──────────┐ ┌───────────────────┐  │  │
-│  │  │  users   │ │  tasks   │ │  activity_logs    │  │  │
-│  │  └──────────┘ └──────────┘ └───────────────────┘  │  │
-│  │  ┌───────────────┐                                │  │
-│  │  │ notifications │                                │  │
-│  │  └───────────────┘                                │  │
-│  └───────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                        CLIENT BROWSER                        │
+│              Next.js 14 + TypeScript + Tailwind              │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ HTTP REST API calls
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     FLASK BACKEND (Render)                   │
+│                                                              │
+│  ┌─────────────┐  ┌──────────────┐  ┌───────────────────┐  │
+│  │ /api/tasks  │  │  /api/users  │  │ /api/notifications│  │
+│  └──────┬──────┘  └──────┬───────┘  └─────────┬─────────┘  │
+│         │                │                     │             │
+│         └────────────────┼─────────────────────┘            │
+│                          │                                   │
+│                  ┌───────▼────────┐                         │
+│                  │  Supabase SDK  │                         │
+│                  └───────┬────────┘                         │
+│                          │  Gmail SMTP                       │
+│                  ┌───────▼────────┐                         │
+│                  │  Email Service │                         │
+│                  └────────────────┘                         │
+└───────────────────────────┬─────────────────────────────────┘
+                            │ PostgreSQL queries
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    SUPABASE (PostgreSQL)                      │
+│                                                              │
+│   users │ tasks │ activity_logs │ notifications              │
+│                                                              │
+│   Google OAuth 2.0 via Supabase Auth                        │
+└─────────────────────────────────────────────────────────────┘
 ```
-
-## ✨ Features
-
-- **Google OAuth Login** — Sign in with Gmail, profile photo and name pulled automatically
-- **Task Management** — Create, update, delete tasks with title, description, due date, priority, and status
-- **Kanban Board** — Drag-and-drop tasks between Todo, In Progress, and Completed columns
-- **Task List View** — Sortable table with filtering by assignee, priority, and status
-- **Email Notifications** — Beautiful HTML emails on task assignment and completion via Gmail SMTP
-- **In-App Notifications** — Bell icon with unread count and notification dropdown
-- **Dashboard** — Summary cards with task counts and recent activity feed
-- **Overdue Detection** — Tasks past due date automatically show red "Overdue" badge
-- **User Management** — Automatic registration on first Google sign-in
-- **Responsive Design** — Full mobile support with hamburger menu and stacked layouts
-- **Loading Skeletons** — Polished loading states instead of spinners
-- **Toast Notifications** — Feedback for every action
-
-## 🛠️ Tech Stack
-
-| Layer       | Technology                                    |
-| ----------- | --------------------------------------------- |
-| Frontend    | Next.js 14, TypeScript, Tailwind CSS 3        |
-| Animations  | Framer Motion                                 |
-| Drag & Drop | @hello-pangea/dnd                             |
-| Backend     | Python Flask REST API                         |
-| Database    | Supabase (PostgreSQL)                         |
-| Auth        | Google OAuth 2.0 via Supabase Auth            |
-| Email       | Gmail SMTP via Python smtplib                 |
-| Deployment  | Vercel (Frontend), Render (Backend), Supabase |
-
-## 📦 Project Structure
-
-```
-Assign/
-├── frontend/               # Next.js 14 application
-│   ├── src/
-│   │   ├── app/            # App Router pages
-│   │   ├── components/     # React components
-│   │   ├── hooks/          # Custom React hooks
-│   │   ├── lib/            # Supabase client, API client, utilities
-│   │   ├── providers/      # Auth context provider
-│   │   └── types/          # TypeScript interfaces
-│   ├── public/             # Static assets
-│   └── package.json
-├── backend/                # Flask REST API
-│   ├── app/
-│   │   ├── routes/         # API route blueprints
-│   │   ├── services/       # Email & notification services
-│   │   ├── middleware/     # JWT auth middleware
-│   │   └── templates/     # HTML email templates
-│   ├── requirements.txt
-│   └── run.py
-├── migrations/             # SQL migration files
-├── render.yaml             # Render deployment config
-├── vercel.json             # Vercel deployment config
-└── README.md
-```
-
-## 🚀 Local Development Setup
-
-### Prerequisites
-
-- **Node.js** 18+ and npm
-- **Python** 3.11+
-- **Supabase** account ([supabase.com](https://supabase.com))
-- **Google Cloud** project with OAuth 2.0 credentials
-- **Gmail** account with App Password enabled
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/assign.git
-cd assign
-```
-
-### 2. Set Up Supabase
-
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Run the SQL migration files in order in the Supabase SQL Editor:
-   - `migrations/001_create_users.sql`
-   - `migrations/002_create_tasks.sql`
-   - `migrations/003_create_activity_logs.sql`
-   - `migrations/004_create_notifications.sql`
-   - `migrations/005_create_rls_policies.sql`
-3. Go to **Authentication > Providers** and enable Google OAuth
-4. Note your project URL, anon key, service role key, and JWT secret from **Settings > API**
-
-### 3. Set Up Google OAuth
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project (or use existing)
-3. Enable the **Google+ API**
-4. Go to **Credentials** > Create **OAuth 2.0 Client ID**
-5. Add authorized redirect URI: `https://your-project-id.supabase.co/auth/v1/callback`
-6. Copy the Client ID and Client Secret into Supabase Auth Google provider settings
-
-### 4. Set Up Gmail SMTP
-
-1. Enable **2-Factor Authentication** on your Gmail account
-2. Go to [Google App Passwords](https://myaccount.google.com/apppasswords)
-3. Generate an App Password for "Mail"
-4. Save the 16-character password
-
-### 5. Configure Environment Variables
-
-```bash
-# Root level
-cp .env.example .env
-
-# Frontend
-cp frontend/.env.example frontend/.env.local
-
-# Backend
-cp backend/.env.example backend/.env
-```
-
-Fill in all values in each `.env` file.
-
-### 6. Start the Backend
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python run.py
-```
-
-The Flask API will start at `http://localhost:5000`.
-
-### 7. Start the Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The Next.js app will start at `http://localhost:3000`.
-
-## 🌐 Deployment
-
-### Frontend → Vercel
-
-1. Push your code to GitHub
-2. Import the repository in [Vercel](https://vercel.com)
-3. Set the **Root Directory** to `frontend`
-4. Add environment variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_API_URL` (your Render backend URL)
-5. Deploy
-
-### Backend → Render
-
-1. Push your code to GitHub
-2. Create a new **Web Service** in [Render](https://render.com)
-3. Connect your repository
-4. Use the `render.yaml` for one-click setup, or configure manually:
-   - **Build Command**: `cd backend && pip install -r requirements.txt`
-   - **Start Command**: `cd backend && gunicorn "app:create_app()" --config gunicorn.conf.py`
-5. Add all environment variables from `backend/.env.example`
-6. Deploy
-
-### Database → Supabase
-
-Already hosted on Supabase. No additional deployment needed.
-
-## 📸 Screenshots
-
-_Coming soon — add screenshots of the dashboard, kanban board, task list, and email templates._
-
-## 📄 Environment Variables
-
-| Variable                       | Where    | Description                                |
-| ------------------------------ | -------- | ------------------------------------------ |
-| `NEXT_PUBLIC_SUPABASE_URL`     | Frontend | Supabase project URL                       |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`| Frontend | Supabase anonymous key                     |
-| `NEXT_PUBLIC_API_URL`          | Frontend | Flask backend URL                          |
-| `SUPABASE_URL`                 | Backend  | Supabase project URL                       |
-| `SUPABASE_SERVICE_ROLE_KEY`    | Backend  | Supabase service role key (admin access)   |
-| `SUPABASE_JWT_SECRET`          | Backend  | Supabase JWT secret for token verification |
-| `GMAIL_ADDRESS`                | Backend  | Gmail address for sending emails           |
-| `GMAIL_APP_PASSWORD`           | Backend  | Gmail App Password (not regular password)  |
-| `FRONTEND_URL`                 | Backend  | Frontend URL for email template links      |
-| `FLASK_SECRET_KEY`             | Backend  | Flask secret key for session security      |
-| `FLASK_ENV`                    | Backend  | `development` or `production`              |
-
-## 📝 API Endpoints
-
-| Method | Endpoint                        | Description                          |
-| ------ | ------------------------------- | ------------------------------------ |
-| POST   | `/api/auth/callback`            | Register/update user after OAuth     |
-| GET    | `/api/tasks`                    | Get all tasks for current user       |
-| POST   | `/api/tasks`                    | Create a new task                    |
-| GET    | `/api/tasks/:id`                | Get task details with activity log   |
-| PUT    | `/api/tasks/:id`                | Update task (status, priority, etc.) |
-| DELETE | `/api/tasks/:id`                | Delete a task (creator only)         |
-| GET    | `/api/users`                    | Get all registered users             |
-| GET    | `/api/notifications`            | Get current user's notifications     |
-| PUT    | `/api/notifications/:id/read`   | Mark notification as read            |
-| GET    | `/api/health`                   | Health check endpoint                |
-
-## 📜 License
-
-This project is for educational and portfolio purposes.
 
 ---
 
-<div align="center">
+## 🛠️ Tech Stack
 
-**Built with ❤️ using Next.js, Flask, and Supabase**
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 14, TypeScript, Tailwind CSS, Framer Motion |
+| Backend | Python, Flask, flask-cors, PyJWT |
+| Database | Supabase (PostgreSQL) |
+| Auth | Google OAuth 2.0 via Supabase Auth (ES256 JWKS) |
+| Email | Gmail SMTP (smtplib) with HTML templates |
+| Drag & Drop | @hello-pangea/dnd |
+| Deployment (Frontend) | Vercel |
+| Deployment (Backend) | Render |
 
-✓ Assign — Delegate. Track. Done.
+---
 
-</div>
-]]>
+## 🗄️ Database Schema
+
+### `users`
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| email | text | User's Gmail address |
+| name | text | Display name from Google |
+| avatar_url | text | Profile photo URL |
+| created_at | timestamp | Registration time |
+
+### `tasks`
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| title | text | Task title |
+| description | text | Task description (max 500 chars) |
+| status | enum | todo / in_progress / completed |
+| priority | enum | low / medium / high |
+| due_date | date | Due date |
+| creator_id | uuid | FK → users.id |
+| assignee_id | uuid | FK → users.id |
+| created_at | timestamp | Creation time |
+| updated_at | timestamp | Last update time |
+
+### `activity_logs`
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| task_id | uuid | FK → tasks.id (CASCADE) |
+| user_id | uuid | FK → users.id |
+| action | text | What changed |
+| old_value | text | Previous value |
+| new_value | text | New value |
+| created_at | timestamp | When it happened |
+
+### `notifications`
+| Column | Type | Description |
+|--------|------|-------------|
+| id | uuid | Primary key |
+| user_id | uuid | FK → users.id (CASCADE) |
+| task_id | uuid | FK → tasks.id (CASCADE) |
+| message | text | Notification text |
+| is_read | boolean | Read status |
+| created_at | timestamp | Creation time |
+
+---
+
+## 📁 Project Structure
+
+```
+assign/
+├── frontend/                       # Next.js 14 + TypeScript
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── dashboard/          # Dashboard page
+│   │   │   ├── tasks/
+│   │   │   │   ├── board/          # Kanban board
+│   │   │   │   └── [id]/           # Task detail page
+│   │   │   ├── auth/callback/      # OAuth callback handler
+│   │   │   ├── page.tsx            # Login page
+│   │   │   └── layout.tsx          # Root layout
+│   │   ├── components/
+│   │   │   ├── dashboard/          # SummaryCards, ActivityFeed
+│   │   │   ├── layout/             # AppLayout, Sidebar, Navbar
+│   │   │   ├── notifications/      # NotificationBell, Panel
+│   │   │   ├── tasks/              # TaskCard, KanbanBoard, CreateTaskModal
+│   │   │   └── ui/                 # Button, Avatar, Skeleton, Toast
+│   │   ├── hooks/                  # useTasks, useUsers, useNotifications
+│   │   ├── lib/                    # API client, Supabase client
+│   │   └── providers/              # AuthProvider (context)
+│   ├── tailwind.config.ts
+│   ├── vercel.json
+│   └── package.json
+│
+├── backend/                        # Python Flask REST API
+│   ├── app/
+│   │   ├── __init__.py             # App factory, CORS, error handlers
+│   │   ├── config.py               # Environment variable config
+│   │   ├── models.py               # Supabase CRUD operations
+│   │   ├── routes/
+│   │   │   ├── auth.py             # POST /api/auth/callback
+│   │   │   ├── tasks.py            # CRUD /api/tasks
+│   │   │   ├── users.py            # GET /api/users
+│   │   │   └── notifications.py    # GET/PUT /api/notifications
+│   │   ├── services/
+│   │   │   ├── email_service.py    # Gmail SMTP integration
+│   │   │   └── notification_service.py
+│   │   └── middleware/
+│   │       └── auth_middleware.py   # JWT verification (ES256 JWKS)
+│   ├── run.py                      # Entry point
+│   ├── render.yaml                 # Render deployment config
+│   └── requirements.txt
+│
+├── migrations/
+│   ├── 000_full_setup.sql          # Complete schema + RLS policies
+│   ├── 001_create_users.sql
+│   ├── 002_create_tasks.sql
+│   ├── 003_create_activity_logs.sql
+│   ├── 004_create_notifications.sql
+│   └── 005_create_rls_policies.sql
+│
+└── README.md
+```
+
+---
+
+## 🚀 Local Setup
+
+### Prerequisites
+- Node.js 18+
+- Python 3.10+
+- A Supabase account
+- A Google Cloud project with OAuth credentials
+- Gmail account with App Password enabled
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/raunak-cybersec/Assign.git
+cd Assign
+```
+
+### 2. Backend setup
+```bash
+cd backend
+pip install -r requirements.txt
+cp .env.example .env
+# Fill in your .env values (see below)
+python run.py
+```
+
+### 3. Frontend setup
+```bash
+cd frontend
+npm install
+cp .env.example .env.local
+# Fill in your .env.local values (see below)
+npm run dev
+```
+
+### 4. Database setup
+- Go to your Supabase project → SQL Editor
+- Paste and run `migrations/000_full_setup.sql`
+
+### 5. Open the app
+Visit `http://localhost:3000`
+
+---
+
+## 🔐 Environment Variables
+
+### Backend (`backend/.env`)
+```env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+SUPABASE_JWT_SECRET=your_jwt_secret
+GMAIL_ADDRESS=your_gmail@gmail.com
+GMAIL_APP_PASSWORD=your_16_character_app_password
+FRONTEND_URL=http://localhost:3000
+FLASK_SECRET_KEY=any_random_secret_string
+FLASK_ENV=development
+```
+
+### Frontend (`frontend/.env.local`)
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+---
+
+## 📧 Email Notification Flow
+
+```
+User creates task → Flask receives POST /api/tasks
+       │
+       ▼
+Task saved to Supabase
+       │
+       ▼
+Gmail SMTP triggered → HTML email sent to assignee
+("You have been assigned a new task: [title]")
+
+User marks task complete → Flask receives PUT /api/tasks/:id
+       │
+       ▼
+Status updated in Supabase + activity_logs entry created
+       │
+       ▼
+Gmail SMTP triggered → HTML email sent to task creator
+("[Assignee name] completed your task: [title]")
+```
+
+---
+
+## 🔑 API Reference
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/callback` | Bearer JWT | Upsert user after Google OAuth |
+| GET | `/api/tasks` | Bearer JWT | Get all tasks for logged-in user |
+| POST | `/api/tasks` | Bearer JWT | Create task + send assignment email |
+| GET | `/api/tasks/:id` | Bearer JWT | Get task details with creator/assignee |
+| PUT | `/api/tasks/:id` | Bearer JWT | Update task + send completion email |
+| DELETE | `/api/tasks/:id` | Bearer JWT | Delete a task (creator only) |
+| GET | `/api/users` | Bearer JWT | Get all registered users |
+| GET | `/api/notifications` | Bearer JWT | Get notifications for user |
+| PUT | `/api/notifications/:id/read` | Bearer JWT | Mark notification as read |
+| GET | `/api/health` | None | Health check endpoint |
+
+---
+
+## 🚢 Deployment
+
+### Frontend → Vercel
+1. Import repo on [vercel.com](https://vercel.com)
+2. Set Root Directory to `frontend`
+3. Add environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_API_URL`)
+4. Deploy
+
+### Backend → Render
+1. Create new Web Service on [render.com](https://render.com)
+2. Connect GitHub repo — Render auto-detects `render.yaml`
+3. Add environment variables in Render dashboard
+4. Deploy
+
+---
+
+## 👨‍💻 Author
+
+**Raunak Rai**
+- 2nd Year B.Tech CSE — SRM University AP
+- MongoDB Associate Developer Certified
+- Portfolio: [raunakrai.vercel.app](https://raunakrai.vercel.app)
+- GitHub: [github.com/raunak-cybersec](https://github.com/raunak-cybersec)
+- LinkedIn: [linkedin.com/in/raunak-rai-35968b316](https://linkedin.com/in/raunak-rai-35968b316)
