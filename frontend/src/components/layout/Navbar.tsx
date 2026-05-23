@@ -15,7 +15,7 @@ export default function Navbar({ title, onMenuClick }: NavbarProps) {
   const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#e4e4e7]">
+    <header className="sticky top-0 z-30 bg-[#eeedf5] border-b border-[#e2e0f0]">
       <div className="flex items-center justify-between px-4 lg:px-8 h-16">
         <div className="flex items-center gap-3">
           <button

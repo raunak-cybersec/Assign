@@ -32,8 +32,8 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   });
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({ message: 'Request failed' }));
-    throw new Error(errorData.message || `HTTP ${res.status}: ${res.statusText}`);
+    const errorData = await res.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(errorData.error || errorData.message || `HTTP ${res.status}: ${res.statusText}`);
   }
 
   if (res.status === 204) {

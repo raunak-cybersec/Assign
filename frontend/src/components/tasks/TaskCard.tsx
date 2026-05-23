@@ -22,8 +22,9 @@ export default function TaskCard({ task, index }: TaskCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2, delay: index * 0.04 }}
       onClick={() => router.push(`/tasks/${task.id}`)}
-      className="bg-white rounded-lg p-4 shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.04)]
-        cursor-pointer hover:bg-[#f4f4f5] transition-colors duration-150 group"
+      className="bg-white rounded-lg p-4 border border-[#e2e0f0]
+        shadow-sm hover:shadow-md hover:border-[#c4b5fd]
+        cursor-pointer transition-all duration-200 group"
     >
       <h4 className="text-sm font-medium text-[#1c1c1e] mb-2 truncate group-hover:text-[#7c3aed] transition-colors">
         {task.title}

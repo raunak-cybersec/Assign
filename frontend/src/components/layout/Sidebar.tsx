@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
+
 import {
   LayoutDashboard,
   Columns3,
@@ -33,7 +33,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   };
 
   return (
-    <div className="flex flex-col h-full w-64 bg-[#1c1c1e] text-white">
+    <div className="flex flex-col h-full w-64 bg-gradient-to-b from-[#1e1b4b] via-[#1a1642] to-[#0f172a] text-white">
       {/* Logo */}
       <div className="px-5 pt-6 pb-8">
         <Link
@@ -41,7 +41,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
           className="flex items-center gap-2.5"
           onClick={handleNavClick}
         >
-          <div className="w-8 h-8 rounded-lg bg-[#7c3aed] flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#8b5cf6] to-[#6d28d9] flex items-center justify-center shadow-lg shadow-purple-500/30">
             <CheckCircle2 size={18} className="text-white" />
           </div>
           <span className="text-lg font-bold tracking-tight">Assign</span>
@@ -63,18 +63,21 @@ export default function Sidebar({ onClose }: SidebarProps) {
               onClick={handleNavClick}
               className="block relative"
             >
-              <motion.div
+              <div
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-white/10 text-white'
-                    : 'text-[#a1a1aa] hover:bg-white/5 hover:text-white'
+                    ? 'bg-gradient-to-r from-[#7c3aed]/30 to-[#6d28d9]/20 text-white shadow-sm shadow-purple-500/10'
+                    : 'text-[#c4b5fd] hover:bg-white/5 hover:text-white'
                 }`}
-                whileHover={{ x: 2 }}
-                transition={{ duration: 0.15 }}
               >
                 <Icon size={18} />
                 {item.label}
-              </motion.div>
+                {isActive && (
+                  <div
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#8b5cf6] rounded-r-full"
+                  />
+                )}
+              </div>
             </Link>
           );
         })}
@@ -83,7 +86,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
       {/* User section */}
       {user && (
         <div className="px-3 pb-4 mt-auto">
-          <div className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white/5">
+          <div className="flex items-center gap-3 px-3 py-3 rounded-lg bg-white/5 border border-white/5">
             <Avatar
               src={user.avatar_url}
               name={user.name}
@@ -93,11 +96,11 @@ export default function Sidebar({ onClose }: SidebarProps) {
               <p className="text-sm font-medium text-white truncate">
                 {user.name}
               </p>
-              <p className="text-xs text-[#71717a] truncate">{user.email}</p>
+              <p className="text-xs text-[#a5b4fc] truncate">{user.email}</p>
             </div>
             <button
               onClick={signOut}
-              className="p-1.5 rounded-md text-[#71717a] hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-md text-[#a5b4fc] hover:text-white hover:bg-white/10 transition-colors"
               title="Sign out"
             >
               <LogOut size={16} />

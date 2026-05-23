@@ -35,7 +35,7 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#fafaf8]">
+      <div className="flex items-center justify-center min-h-screen bg-[#f0eef6]">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 rounded-xl bg-[#7c3aed] flex items-center justify-center mx-auto">
             <Skeleton className="w-6 h-6" rounded="rounded" />
@@ -54,7 +54,7 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen bg-[#fafaf8]">
+    <div className="flex h-screen bg-[#f0eef6]">
       {/* Desktop Sidebar */}
       <div className="hidden lg:flex lg:flex-shrink-0">
         <Sidebar />

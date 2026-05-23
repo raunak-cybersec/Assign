@@ -7,11 +7,18 @@ so that Row Level Security is bypassed on the server side.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
+import httpx
 from supabase import Client, create_client
 
 from app.config import Config
+
+# Suppress extremely verbose httpx/hpack debug logs
+logging.getLogger('httpx').setLevel(logging.WARNING)
+logging.getLogger('httpcore').setLevel(logging.WARNING)
+logging.getLogger('hpack').setLevel(logging.WARNING)
 
 # ---------------------------------------------------------------------------
 # Singleton client
@@ -21,11 +28,27 @@ _client: Client | None = None
 
 
 def get_supabase() -> Client:
-    """Return (and lazily create) the Supabase service-role client."""
+    """Return (and lazily create) the Supabase service-role client.
+
+    Uses HTTP/1.1 to avoid HTTP/2 connection pool issues when
+    multiple concurrent requests share a single connection.
+    """
     global _client
     if _client is None:
-        _client = create_client(Config.SUPABASE_URL, Config.SUPABASE_SERVICE_ROLE_KEY)
+        _client = create_client(
+            Config.SUPABASE_URL,
+            Config.SUPABASE_SERVICE_ROLE_KEY,
+        )
+        # Force HTTP/1.1 on the underlying postgrest client to avoid
+        # HTTP/2 ConnectionTerminated errors.
+        _client.postgrest.session = httpx.Client(
+            base_url=f"{Config.SUPABASE_URL}/rest/v1",
+            headers=_client.postgrest.session.headers,
+            http2=False,
+            timeout=30.0,
+        )
     return _client
+
 
 
 # ---------------------------------------------------------------------------

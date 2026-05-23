@@ -31,14 +31,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const supaUser = s.user;
       const userData = {
-        id: supaUser.id,
+        user_id: supaUser.id,
         email: supaUser.email || '',
         name: supaUser.user_metadata?.full_name || supaUser.user_metadata?.name || supaUser.email || '',
         avatar_url: supaUser.user_metadata?.avatar_url || null,
       };
 
-      const backendUser = await api.post<User>('/api/auth/callback', userData);
-      setUser(backendUser);
+      const response = await api.post<{ user: User }>('/api/auth/callback', userData);
+      setUser(response.user);
     } catch (error) {
       console.error('Failed to sync user with backend:', error);
       const supaUser = s.user;

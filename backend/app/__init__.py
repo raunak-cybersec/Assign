@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from app.config import Config
@@ -20,6 +20,7 @@ def create_app() -> Flask:
     """
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.url_map.strict_slashes = False
 
     # ---- Logging --------------------------------------------------------
     logging.basicConfig(
@@ -41,6 +42,25 @@ def create_app() -> Flask:
         allow_headers=['Content-Type', 'Authorization'],
         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     )
+
+    # ---- Preflight handler (must be before any route) -------------------
+    # This ensures OPTIONS requests are handled immediately and never
+    # redirected or caught by a route that returns a 3xx.
+    @app.before_request
+    def handle_preflight():
+        if request.method == 'OPTIONS':
+            return '', 200
+
+    # ---- Ensure CORS headers on EVERY response (including errors) -------
+    @app.after_request
+    def add_cors_headers(response):
+        origin = request.headers.get('Origin')
+        if origin and origin in allowed_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
+            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        return response
 
     # ---- Validate env vars ----------------------------------------------
     missing = Config.validate()
@@ -86,3 +106,4 @@ def create_app() -> Flask:
         return jsonify({'error': 'Method not allowed'}), 405
 
     return app
+

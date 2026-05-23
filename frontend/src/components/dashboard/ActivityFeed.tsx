@@ -13,7 +13,7 @@ interface ActivityFeedProps {
 export default function ActivityFeed({ activities, loading }: ActivityFeedProps) {
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.04)] p-6">
+      <div className="bg-white rounded-xl border border-[#e2e0f0] shadow-sm p-6">
         <h3 className="text-sm font-semibold text-[#1c1c1e] mb-4">Recent Activity</h3>
         <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -31,7 +31,7 @@ export default function ActivityFeed({ activities, loading }: ActivityFeedProps)
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-[0_1px_3px_rgba(0,0,0,0.08),0_8px_24px_rgba(0,0,0,0.04)] p-6">
+    <div className="bg-white rounded-xl border border-[#e2e0f0] shadow-sm p-6">
       <h3 className="text-sm font-semibold text-[#1c1c1e] mb-4">Recent Activity</h3>
       {activities.length > 0 ? (
         <div className="space-y-4 max-h-[400px] overflow-y-auto pr-1">
