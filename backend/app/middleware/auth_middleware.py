@@ -1,16 +1,21 @@
+"""JWT authentication middleware for Flask routes."""
+
+from __future__ import annotations
+
+import base64
+import os
 from functools import wraps
 
 import jwt
 from flask import g, jsonify, request, current_app
 
-from app.config import Config
-
 
 def require_auth(f):
     """Decorator that verifies the Supabase JWT from the Authorization header.
 
-    Uses HS256 with SUPABASE_JWT_SECRET.
-    On success sets g.user_id (sub claim) and g.user_email.
+    Tries decoding with the raw secret first, then with base64-decoded
+    secret (Supabase JWT secrets are base64url-encoded strings).
+    On success sets g.user_id and g.user_email.
     On failure returns a 401 JSON response.
     """
 
@@ -18,27 +23,50 @@ def require_auth(f):
     def decorated_function(*args, **kwargs):
         auth_header = request.headers.get('Authorization', '')
 
-        if not auth_header:
-            return jsonify({'error': 'Authorization header is required'}), 401
+        if not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'No token provided'}), 401
 
-        parts = auth_header.split()
-        if len(parts) != 2 or parts[0].lower() != 'bearer':
-            return jsonify({'error': 'Authorization header must be: Bearer <token>'}), 401
+        token = auth_header.split(' ', 1)[1].strip()
+        if not token:
+            return jsonify({'error': 'Empty token'}), 401
 
-        token = parts[1]
+        secret = os.environ.get('SUPABASE_JWT_SECRET', '')
+        if not secret:
+            current_app.logger.error('SUPABASE_JWT_SECRET env var not set')
+            return jsonify({'error': 'Server misconfiguration'}), 500
 
+        payload = None
+        last_error = None
+
+        # Attempt 1: raw secret string (works if Render has raw value)
         try:
             payload = jwt.decode(
                 token,
-                Config.SUPABASE_JWT_SECRET,
+                secret,
                 algorithms=['HS256'],
                 options={'verify_aud': False},
             )
-        except jwt.ExpiredSignatureError:
-            return jsonify({'error': 'Token has expired'}), 401
-        except jwt.InvalidTokenError as e:
-            current_app.logger.warning('JWT decode failed: %s', e)
-            return jsonify({'error': 'Invalid or expired token'}), 401
+        except Exception as e:
+            last_error = e
+
+        # Attempt 2: base64-decoded secret (Supabase JWT secrets are base64url)
+        if payload is None:
+            try:
+                # Pad the base64 string if needed
+                padded = secret + '=' * (-len(secret) % 4)
+                decoded_secret = base64.b64decode(padded)
+                payload = jwt.decode(
+                    token,
+                    decoded_secret,
+                    algorithms=['HS256'],
+                    options={'verify_aud': False},
+                )
+            except Exception as e:
+                last_error = e
+
+        if payload is None:
+            current_app.logger.warning('JWT decode failed: %s', last_error)
+            return jsonify({'error': 'Invalid or expired token', 'detail': str(last_error)}), 401
 
         user_id = payload.get('sub')
         if not user_id:
@@ -46,6 +74,9 @@ def require_auth(f):
 
         g.user_id = user_id
         g.user_email = payload.get('email', '')
+        request.user_id = user_id
+        request.user_email = payload.get('email', '')
+
         return f(*args, **kwargs)
 
     return decorated_function
