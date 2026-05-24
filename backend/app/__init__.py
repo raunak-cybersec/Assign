@@ -31,6 +31,9 @@ def create_app() -> Flask:
     # ---- CORS -----------------------------------------------------------
     allowed_origins = [
         'http://localhost:3000',
+        # Production Vercel URLs
+        'https://assign-git-main-raunak-cybersecs-projects.vercel.app',
+        'https://assign-raunak.vercel.app',
     ]
     if Config.FRONTEND_URL and Config.FRONTEND_URL not in allowed_origins:
         allowed_origins.append(Config.FRONTEND_URL)

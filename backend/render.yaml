@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: assign-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://assign-git-main-raunak-cybersecs-projects.vercel.app
