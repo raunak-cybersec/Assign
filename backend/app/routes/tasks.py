@@ -87,8 +87,8 @@ def create_task():
     if priority not in VALID_PRIORITIES:
         return jsonify({'error': f'Invalid priority. Must be one of: {", ".join(VALID_PRIORITIES)}'}), 400
 
-    due_date = data.get('due_date')  # expected ISO format string or None
-    assignee_id = data.get('assignee_id')
+    due_date = data.get('due_date') or None
+    assignee_id = data.get('assignee_id') or None
 
     task_payload = {
         'title': title,

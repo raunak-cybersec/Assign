@@ -31,13 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const supaUser = s.user;
       const userData = {
-        user_id: supaUser.id,
+        id: supaUser.id,
         email: supaUser.email || '',
         name: supaUser.user_metadata?.full_name || supaUser.user_metadata?.name || supaUser.email || '',
-        avatar_url: supaUser.user_metadata?.avatar_url || null,
+        avatar_url: supaUser.user_metadata?.avatar_url || supaUser.user_metadata?.picture || null,
       };
 
-      const response = await api.post<{ user: User }>('/api/auth/callback', userData);
+      const response = await api.post<{ user: User }>('/api/auth/register', userData);
       setUser(response.user);
     } catch (error) {
       console.error('Failed to sync user with backend:', error);
@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         id: supaUser.id,
         email: supaUser.email || '',
         name: supaUser.user_metadata?.full_name || supaUser.user_metadata?.name || supaUser.email || '',
-        avatar_url: supaUser.user_metadata?.avatar_url || null,
+        avatar_url: supaUser.user_metadata?.avatar_url || supaUser.user_metadata?.picture || null,
         created_at: supaUser.created_at,
       });
     }
