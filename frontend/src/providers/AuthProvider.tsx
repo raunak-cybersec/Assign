@@ -52,6 +52,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Warmup ping to prevent backend cold start lag on Render free tier
+  useEffect(() => {
+    fetch('https://assign-fma7.onrender.com/api/health').catch(() => {});
+  }, []);
+
   useEffect(() => {
     const initAuth = async () => {
       try {
