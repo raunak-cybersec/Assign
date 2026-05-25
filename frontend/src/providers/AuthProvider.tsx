@@ -4,6 +4,7 @@ import React, { createContext, useEffect, useState, useCallback } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { api } from '@/lib/api';
+import { startKeepalive } from '@/lib/keepalive';
 import { User } from '@/types';
 
 interface AuthContextType {
@@ -54,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Warmup ping to prevent backend cold start lag on Render free tier
   useEffect(() => {
-    fetch('https://assign-fma7.onrender.com/api/health').catch(() => {});
+    startKeepalive();
   }, []);
 
   useEffect(() => {

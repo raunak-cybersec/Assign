@@ -136,8 +136,9 @@ def create_task():
                     task=task,
                     creator_name=creator_name,
                 )
-        except Exception:
-            pass  # notifications/email are best-effort
+        except Exception as e:
+            from flask import current_app
+            current_app.logger.error(f"Failed to send assignment notification/email: {e}")
 
     return jsonify({'task': task}), 201
 
