@@ -18,14 +18,7 @@ def require_auth(f):
             return jsonify({'error': 'No token'}), 401
         token = auth_header.split(' ')[1]
         try:
-            secret_raw = os.environ.get('SUPABASE_JWT_SECRET', '')
-            # Try base64 decode first, fall back to raw string
-            try:
-                padding = 4 - len(secret_raw) % 4
-                secret = base64.b64decode(secret_raw + '=' * padding)
-            except Exception:
-                secret = secret_raw.encode('utf-8')
-            
+            secret = os.environ.get('SUPABASE_JWT_SECRET', '')
             payload = jwt.decode(
                 token,
                 secret,
