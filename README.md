@@ -14,8 +14,8 @@
 
 | Service | URL |
 |--------|-----|
-| **Frontend** | [assign-raunak.vercel.app](https://assign-raunak.vercel.app) |
-| **Backend API** | [assign-backend.onrender.com](https://assign-backend.onrender.com) |
+| **Frontend** | [assign-git-main-raunak-cybersecs-projects.vercel.app](https://assign-git-main-raunak-cybersecs-projects.vercel.app) |
+| **Backend API** | [assign-fma7.onrender.com](https://assign-fma7.onrender.com) |
 
 > **Note:** Backend is hosted on Render free tier — may take 30–60 seconds to wake up on first request.
 
@@ -25,7 +25,7 @@
 
 - **Google OAuth 2.0** — Sign in with Gmail, profile photo and name pulled automatically
 - **Create & Assign Tasks** — Title, description, due date, priority (Low / Medium / High), assign to any registered user
-- **Email Notifications** — HTML-branded email sent via Gmail SMTP when a task is assigned, and when a task is marked complete
+- **Email Notifications** — HTML-branded email sent via Resend API when a task is assigned, and when a task is marked complete
 - **Kanban Board** — Drag and drop tasks between Todo → In Progress → Completed columns
 - **Task List View** — Table view with sorting and filtering by status, priority, assignee
 - **Task Detail Page** — Full details, due date countdown, activity log, assignee avatar
@@ -59,7 +59,7 @@
 │                  ┌───────▼────────┐                         │
 │                  │  Supabase SDK  │                         │
 │                  └───────┬────────┘                         │
-│                          │  Gmail SMTP                       │
+│                          │  Resend API                       │
 │                  ┌───────▼────────┐                         │
 │                  │  Email Service │                         │
 │                  └────────────────┘                         │
@@ -85,7 +85,7 @@
 | Backend | Python, Flask, flask-cors, PyJWT |
 | Database | Supabase (PostgreSQL) |
 | Auth | Google OAuth 2.0 via Supabase Auth (ES256 JWKS) |
-| Email | Gmail SMTP (smtplib) with HTML templates |
+| Email | Resend API with HTML templates (Jinja2) |
 | Drag & Drop | @hello-pangea/dnd |
 | Deployment (Frontend) | Vercel |
 | Deployment (Backend) | Render |
@@ -178,7 +178,7 @@ assign/
 │   │   │   ├── users.py            # GET /api/users
 │   │   │   └── notifications.py    # GET/PUT /api/notifications
 │   │   ├── services/
-│   │   │   ├── email_service.py    # Gmail SMTP integration
+│   │   │   ├── email_service.py    # Resend API integration
 │   │   │   └── notification_service.py
 │   │   └── middleware/
 │   │       └── auth_middleware.py   # JWT verification (ES256 JWKS)
@@ -206,7 +206,7 @@ assign/
 - Python 3.10+
 - A Supabase account
 - A Google Cloud project with OAuth credentials
-- Gmail account with App Password enabled
+- A Resend account with API key
 
 ### 1. Clone the repository
 ```bash
@@ -248,8 +248,7 @@ Visit `http://localhost:3000`
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 SUPABASE_JWT_SECRET=your_jwt_secret
-GMAIL_ADDRESS=your_gmail@gmail.com
-GMAIL_APP_PASSWORD=your_16_character_app_password
+RESEND_API_KEY=your_resend_api_key
 FRONTEND_URL=http://localhost:3000
 FLASK_SECRET_KEY=any_random_secret_string
 FLASK_ENV=development
@@ -273,7 +272,7 @@ User creates task → Flask receives POST /api/tasks
 Task saved to Supabase
        │
        ▼
-Gmail SMTP triggered → HTML email sent to assignee
+Resend API triggered → HTML email sent to assignee
 ("You have been assigned a new task: [title]")
 
 User marks task complete → Flask receives PUT /api/tasks/:id
@@ -282,7 +281,7 @@ User marks task complete → Flask receives PUT /api/tasks/:id
 Status updated in Supabase + activity_logs entry created
        │
        ▼
-Gmail SMTP triggered → HTML email sent to task creator
+Resend API triggered → HTML email sent to task creator
 ("[Assignee name] completed your task: [title]")
 ```
 
