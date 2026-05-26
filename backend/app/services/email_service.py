@@ -1,23 +1,24 @@
-"""Email service — sends transactional emails via Gmail SMTP.
+"""Email service — sends transactional emails via Resend API.
 
 All emails are dispatched in a background thread so they never block the
-HTTP response.  SMTP errors are logged but silently swallowed.
+HTTP response.  Errors are logged but silently swallowed.
 """
 
 from __future__ import annotations
 
 import logging
-import smtplib
+import os
 import threading
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from pathlib import Path
 
+import resend
 from jinja2 import Environment, FileSystemLoader
 
 from app.config import Config
 
 logger = logging.getLogger(__name__)
+
+resend.api_key = os.environ.get('RESEND_API_KEY')
 
 # Jinja2 environment pointed at the templates directory
 _TEMPLATES_DIR = Path(__file__).resolve().parent.parent / 'templates'
@@ -30,36 +31,17 @@ _jinja_env = Environment(loader=FileSystemLoader(str(_TEMPLATES_DIR)), autoescap
 
 
 def _send_email(to_address: str, subject: str, html_body: str) -> None:
-    """Send an HTML email via Gmail SMTP (called in a background thread)."""
-    gmail_address = Config.GMAIL_ADDRESS
-    gmail_password = Config.GMAIL_APP_PASSWORD
-
-    if not gmail_address or not gmail_password:
-        logger.warning('Gmail credentials not configured — skipping email to %s', to_address)
-        return
-
-    msg = MIMEMultipart('alternative')
-    msg['From'] = f'Assign <{gmail_address}>'
-    msg['To'] = to_address
-    msg['Subject'] = subject
-
-    # Plain-text fallback
-    plain = 'Please view this email in an HTML-capable email client.'
-    msg.attach(MIMEText(plain, 'plain'))
-    msg.attach(MIMEText(html_body, 'html'))
-
+    """Send an HTML email via Resend API (called in a background thread)."""
     try:
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(gmail_address, gmail_password)
-            server.sendmail(gmail_address, to_address, msg.as_string())
+        resend.Emails.send({
+            "from": "Assign <onboarding@resend.dev>",
+            "to": to_address,
+            "subject": subject,
+            "html": html_body,
+        })
         logger.info('Email sent to %s: %s', to_address, subject)
-    except smtplib.SMTPException:
-        logger.exception('SMTP error sending email to %s', to_address)
-    except Exception:
-        logger.exception('Unexpected error sending email to %s', to_address)
+    except Exception as e:
+        logger.exception('Resend error: %s', e)
 
 
 def _send_email_async(to_address: str, subject: str, html_body: str) -> None:
