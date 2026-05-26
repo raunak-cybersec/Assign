@@ -29,27 +29,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const syncUserWithBackend = useCallback(async (s: Session) => {
-    try {
-      const supaUser = s.user;
-      const userData = {
-        id: supaUser.id,
-        email: supaUser.email || '',
-        name: supaUser.user_metadata?.full_name || supaUser.user_metadata?.name || supaUser.email || '',
-        avatar_url: supaUser.user_metadata?.avatar_url || supaUser.user_metadata?.picture || null,
-      };
+    const supaUser = s.user;
+    const userData = {
+      id: supaUser.id,
+      email: supaUser.email || '',
+      name: supaUser.user_metadata?.full_name ||
+            supaUser.user_metadata?.name ||
+            supaUser.email || '',
+      avatar_url: supaUser.user_metadata?.avatar_url ||
+                  supaUser.user_metadata?.picture || null,
+    };
 
+    // Set user immediately from session so avatar shows instantly
+    setUser({
+      ...userData,
+      created_at: supaUser.created_at,
+    });
+
+    // Then sync with backend (updates user if backend returns richer data)
+    try {
       const response = await api.post<{ user: User }>('/api/auth/register', userData);
-      setUser(response.user);
+      if (response.user) {
+        setUser({
+          ...response.user,
+          // Always prefer Google OAuth avatar over whatever backend has stored
+          avatar_url: userData.avatar_url || response.user.avatar_url,
+        });
+      }
     } catch (error) {
       console.error('Failed to sync user with backend:', error);
-      const supaUser = s.user;
-      setUser({
-        id: supaUser.id,
-        email: supaUser.email || '',
-        name: supaUser.user_metadata?.full_name || supaUser.user_metadata?.name || supaUser.email || '',
-        avatar_url: supaUser.user_metadata?.avatar_url || supaUser.user_metadata?.picture || null,
-        created_at: supaUser.created_at,
-      });
     }
   }, []);
 
